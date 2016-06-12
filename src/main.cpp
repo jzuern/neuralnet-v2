@@ -33,8 +33,8 @@ int main () {
 
 
         // write weights to file
-        std::string filename = "data/weights+biases.csv";
-        nnet.writeWeightsBiasesToCSV(filename);
+        // std::string filename = "data/weights+biases.csv";
+        // nnet.writeWeightsBiasesToCSV(filename);
 
         char c;
         std::cin >> c;

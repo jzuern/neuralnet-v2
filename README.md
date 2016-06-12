@@ -27,8 +27,6 @@ $ ./nnet
 
 - add description text to each function
 - clean up code. A lot!
-- const correctness
-
 
 ## TODO: Speedup
 
@@ -37,6 +35,6 @@ $ ./nnet
 
 ## TODO: More sophisticated
 
-- implement writeWeightsBiasesToCSV method
-- implement cross-entropy cost function
+- include regularization
+- implement read-from-file
 - implement convolutionary neural networks

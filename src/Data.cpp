@@ -4,7 +4,7 @@ Data::Data(){
         // empty constructor
 }
 
-void Data::load_data_from_file(std::string filename){
+void Data::load_data_from_file(const std::string filename){
 
         std::ifstream file(filename);
         std::string line;

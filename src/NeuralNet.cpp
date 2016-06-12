@@ -35,7 +35,7 @@ NeuralNet::NeuralNet(int nInput, int nHidden, int nOutput) {        // construct
 }
 
 
-void NeuralNet::SGD(Data trainingData, int nEpochs, int mini_batch_size, double learningRate, Data validationData){
+void NeuralNet::SGD( Data trainingData,const int nEpochs,const int mini_batch_size,const double learningRate,const Data validationData){
 
         // """Train the neural network using mini-batch stochastic
         //     gradient descent.  The ``training_data`` is a list of tuples
@@ -57,7 +57,7 @@ void NeuralNet::SGD(Data trainingData, int nEpochs, int mini_batch_size, double 
 
               std::cout << "Epoch " << j << " started..." <<  std::endl;
               int dataSetSize = 5000;
-              int nMiniBatches = dataSetSize / mini_batch_size;
+              // int nMiniBatches = dataSetSize / mini_batch_size;
 
               // need random indices from 0 to dataSetSize-1
               std::vector<int> randomIndices;
@@ -80,7 +80,7 @@ void NeuralNet::SGD(Data trainingData, int nEpochs, int mini_batch_size, double 
 
               for(size_t i = 0; i < dataSetSize; i+= mini_batch_size){
                   if(i % 500 == 0) std::cout << "        " << i << " of " <<  dataSetSize << std::endl;
-                  update_mini_batch(mini_batches_img,mini_batches_digits, i,learningRate); // update weigts and biases
+                  update_mini_batch(mini_batches_img,mini_batches_digits, i,learningRate,mini_batch_size); // update weigts and biases
               }
 
               std::cout << "Epoch " << j << ": " << evaluate(validationData) << " / " << nValSets << std::endl;
@@ -89,38 +89,41 @@ void NeuralNet::SGD(Data trainingData, int nEpochs, int mini_batch_size, double 
 
 }
 
-VectorXd NeuralNet::feedforward(VectorXd input){
+VectorXd NeuralNet::feedforward(const VectorXd input){
 
         // feed to hidden layer
         VectorXd temp1 = m_weights[0] * input;
-        VectorXd middle = sigmoid_vector(temp1+ m_biases[0]);
+        VectorXd middle = sigmoid(temp1+ m_biases[0]);
 
         // feed to output layer
        VectorXd temp2 = m_weights[1] * middle;
-       VectorXd out = sigmoid_vector(temp2 + m_biases[1]);
+       VectorXd out = sigmoid(temp2 + m_biases[1]);
 
         return out;
 }
 
 
 
-VectorXd NeuralNet::cost_derivative(VectorXd output_activations, VectorXd y){
 
-        return output_activations - y;
+VectorXd NeuralNet::cost_derivative_cross_entropy(const VectorXd output_activations,const VectorXd digitVec,const VectorXd z){ // cross-entropy cost function
+
+        return output_activations - digitVec;
+}
+
+VectorXd NeuralNet::cost_derivative_quad( VectorXd output_activations, VectorXd digitVec, VectorXd z){ //  quadratic cost function
+
+  VectorXd tmp = output_activations - digitVec;
+  VectorXd delta = tmp.array() * sigmoid_prime(z).array(); // conversion to array in order to perform element-by-element vector multiplication
+
+  return delta;
 }
 
 
-
-void NeuralNet::update_mini_batch(std::vector<VectorXd> images, std::vector<int> digits, int data_idx, double learningRate){
+void NeuralNet::update_mini_batch(const std::vector<VectorXd> images,const std::vector<int> digits,const int data_idx,const double learningRate,const int mini_batch_size){
   // """Update the network's weights and biases by applying
   // gradient descent using backpropagation to a single mini batch.
-  // The ``mini_batch`` is a list of tuples ``(x, y)``, and ``eta``
-  // is the learning rate."""
-
-  int mini_batch_size = 10; // TODO: pass as argument to this function
 
 
-  // preallocate nablas:
   std::vector<std::vector<MatrixXd>> delta_nabla_ws;
   std::vector<std::vector<VectorXd>> delta_nabla_bs;
 
@@ -130,15 +133,15 @@ void NeuralNet::update_mini_batch(std::vector<VectorXd> images, std::vector<int>
 
   for (size_t offs = 0; offs < mini_batch_size; offs++){ // go thorugh mini batch
 
-  int idx = data_idx + offs;
+    int idx = data_idx + offs;
 
-      std::pair<  std::vector<MatrixXd> , std::vector<VectorXd>  > delta_nablas = backprop(images[idx],digits[idx]);
+    std::pair<  std::vector<MatrixXd> , std::vector<VectorXd>  > delta_nablas = backprop(images[idx],digits[idx]);
 
-      delta_nabla_w = delta_nablas.first;
-      delta_nabla_b = delta_nablas.second;
+    delta_nabla_w = delta_nablas.first;
+    delta_nabla_b = delta_nablas.second;
 
-      delta_nabla_ws.push_back(delta_nabla_w);
-      delta_nabla_bs.push_back(delta_nabla_b);
+    delta_nabla_ws.push_back(delta_nabla_w);
+    delta_nabla_bs.push_back(delta_nabla_b);
   }
 
 
@@ -184,7 +187,7 @@ void NeuralNet::update_mini_batch(std::vector<VectorXd> images, std::vector<int>
 }
 
 
-int NeuralNet::evaluate(Data validationData){
+int NeuralNet::evaluate( Data validationData){
 
   // """Return the number of test inputs for which the neural
   // network outputs the correct result. Note that the neural
@@ -216,7 +219,7 @@ int NeuralNet::evaluate(Data validationData){
 
 
 
-std::pair<  std::vector<MatrixXd> , std::vector<VectorXd>  > NeuralNet::backprop(VectorXd img, int digit){
+std::pair<  std::vector<MatrixXd> , std::vector<VectorXd>  > NeuralNet::backprop(const VectorXd img,const int digit){
 
   // def backprop(self, x, y):
   // """Return a tuple ``(nabla_b, nabla_w)`` representing the
@@ -239,34 +242,27 @@ std::pair<  std::vector<MatrixXd> , std::vector<VectorXd>  > NeuralNet::backprop
   for(size_t i = 0; i <= 1; i ++){
     z = m_weights[i] * activation;
     zs.push_back(z);
-    activation = sigmoid_vector(z);
+    activation = sigmoid(z);
     activations.push_back(activation);
 
   }
 
 
-   // %%%%%%%%%%%%%%%%%%%%%%%%%%BACKWARD PASS 1%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   // Backward pass from output layer to hidden layer
 
-
-  VectorXd m1 = cost_derivative(activations[2], digit_vector(digit)); // last entry
-  VectorXd m2 = sigmoid_prime_vector(zs[1]); // last entry
-
-  VectorXd delta1 = m1.array() * m2.array();
+  VectorXd delta1 = cost_derivative_cross_entropy(activations[2], digit_vector(digit), zs[1]);
 
   MatrixXd mult_result1 = activations[1] * delta1.transpose();
 
 
+  // Backward pass from hidden layer to input layer
 
-  // %%%%%%%%%%%%%%%%%%%%%%%%%%BACKWARD PASS 0 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-   VectorXd sp = sigmoid_prime_vector(zs[0]);
+   VectorXd sp = sigmoid_prime(zs[0]);
    VectorXd tmp = m_weights[1].transpose() * delta1;
+   VectorXd delta2 = tmp.array() * sp.array();
 
-  VectorXd delta2 = tmp.array() * sp.array();
 
-
-  MatrixXd mult_result2 = activations[0] * delta2.transpose();
+   MatrixXd mult_result2 = activations[0] * delta2.transpose();
 
 
    nabla_b.push_back(delta2);
@@ -283,7 +279,7 @@ std::pair<  std::vector<MatrixXd> , std::vector<VectorXd>  > NeuralNet::backprop
 }
 
 
-void NeuralNet::writeWeightsBiasesToCSV(std::string filename){
+void NeuralNet::writeWeightsBiasesToCSV(const std::string filename){
 
   std::ofstream myfile;
   myfile.open (filename);

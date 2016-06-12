@@ -14,15 +14,15 @@
 using namespace Eigen;
 
 
-inline double sigmoid(double z){
+inline double sigmoid(const double z){
         // The sigmoid function for scalars
         return 1.0/(1.0+exp(-z));
 }
 
 
-inline VectorXd sigmoid_vector(VectorXd z){
-
+inline VectorXd sigmoid(const VectorXd z){
         // The sigmoid function for vectors
+
         VectorXd result(z.size());
 
         for (size_t i = 0; i < z.size(); i++){
@@ -32,12 +32,12 @@ inline VectorXd sigmoid_vector(VectorXd z){
         return result;
 }
 
-inline double sigmoid_prime(double z){
+inline double sigmoid_prime(const double z){
         // Derivative of the sigmoid function
         return sigmoid(z)*(1.0-sigmoid(z));
 }
 
-inline VectorXd sigmoid_prime_vector(VectorXd z){
+inline VectorXd sigmoid_prime(const VectorXd z){
 
 
         VectorXd result(z.size());
@@ -51,7 +51,7 @@ inline VectorXd sigmoid_prime_vector(VectorXd z){
 }
 
 
-inline VectorXd digit_vector(int digit){
+inline VectorXd digit_vector(const int digit){
 
   VectorXd vec(10);
 

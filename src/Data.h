@@ -27,7 +27,7 @@ class Data {
 
 
 public:
-        void load_data_from_file(std::string filename);
+        void load_data_from_file(const std::string filename);
         Data();                                     // empty constructor
         size_t nEntries;                            // number of entries in data set
         int getDigitEntry(int index);
