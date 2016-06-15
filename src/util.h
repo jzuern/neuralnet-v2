@@ -25,8 +25,8 @@ inline VectorXd sigmoid(const VectorXd z){
 
         VectorXd result(z.size());
 
-        for (size_t i = 0; i < z.size(); i++){
-          result[i] = (1.0/(1.0+exp(-z[i])));
+        for (size_t i = 0; i < z.size(); i++) {
+                result[i] = (1.0/(1.0+exp(-z[i])));
         }
 
         return result;
@@ -42,8 +42,8 @@ inline VectorXd sigmoid_prime(const VectorXd z){
 
         VectorXd result(z.size());
 
-        for (size_t i = 0; i < z.size(); i++){
-          result[i] = sigmoid(z[i]) * (1.0 - sigmoid(z[i]));
+        for (size_t i = 0; i < z.size(); i++) {
+                result[i] = sigmoid(z[i]) * (1.0 - sigmoid(z[i]));
         }
 
 
@@ -53,15 +53,15 @@ inline VectorXd sigmoid_prime(const VectorXd z){
 
 inline VectorXd digit_vector(const int digit){
 
-  VectorXd vec(10);
+        VectorXd vec(10);
 
-  for (size_t i = 0; i < 10; i++){
-    if(i == digit) vec[i] = 1.0;
-    else {
-      vec[i] = 0.0;
-    }
-  }
-  return vec;
+        for (size_t i = 0; i < 10; i++) {
+                if(i == digit) vec[i] = 1.0;
+                else {
+                        vec[i] = 0.0;
+                }
+        }
+        return vec;
 
 }
 
