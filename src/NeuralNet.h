@@ -24,7 +24,10 @@ public:
         void update_mini_batch(const std::vector<VectorXd> images,const std::vector<int> digits,const int idx,const double learningRate,const int mini_batch_size);
         int evaluate( Data);
         std::pair<std::vector<MatrixXd>,std::vector<VectorXd>> backprop(const VectorXd img,const int digit);
-        void writeWeightsBiasesToCSV(const std::string filename);
+
+        friend void writeWeightsBiasesToCSV(const std::string filename, NeuralNet& nnet);
+        friend void readWeightsBiasesFromCSV(const std::string filename, NeuralNet& nnet);
+
 
 private:
         size_t m_nInput;

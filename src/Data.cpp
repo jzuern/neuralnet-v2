@@ -33,9 +33,9 @@ void Data::load_data_from_file(const std::string filename){
                 nEntries += 1;
                 imgData.push_back(image);
 
-                if(nEntries % 10000 == 0) std::cout << "    Allocated " << nEntries << " data sets" << std::endl;
+                // if(nEntries % 10000 == 0) std::cout << "    Allocated " << nEntries << " data sets" << std::endl;
         }
-        std::cout << "Allocated all data sets" << std::endl;
+        // std::cout << "Allocated all data sets" << std::endl;
 }
 
 int Data::getDigitEntry(int index){

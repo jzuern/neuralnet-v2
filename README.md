@@ -1,5 +1,6 @@
 ### C++ Neural Network for digit recognizing. Application on the MNIST data set
-### VERSION 2: Incorporates more sophisticated programming stuff
+
+### VERSION 2: Incorporates more sophisticated programming stuff like parallelization, regularization, ...
 
 ## Requirements
 
@@ -23,18 +24,15 @@ $ ./nnet
 
 
 
-## TODO: Style
-
-- add description text to each function
-- clean up code. A lot!
-
 ## TODO: Speedup
 
 - use openMP to parallelize learning
-- pointer?
+
 
 ## TODO: More sophisticated
 
 - include regularization
+
 - implement read-from-file
+
 - implement convolutionary neural networks
