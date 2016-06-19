@@ -53,13 +53,13 @@ NeuralNet::NeuralNet(int nInput, int nHidden, int nOutput) {        // construct
         m_weights.push_back(weights_1);
         m_weights.push_back(weights_2);
 
-        std::cout << "m_weights dimensions: " << m_weights[0].cols() << " " << m_weights[0].rows() << " " << m_weights[1].cols() << " " << m_weights[1].rows() << std::endl;
-        std::cout << "m_biases dimensions: " << m_biases[0].size() << " " << m_biases[1].size() << std::endl;
+        // std::cout << "m_weights dimensions: " << m_weights[0].cols() << " " << m_weights[0].rows() << " " << m_weights[1].cols() << " " << m_weights[1].rows() << std::endl;
+        // std::cout << "m_biases dimensions: " << m_biases[0].size() << " " << m_biases[1].size() << std::endl;
 
 }
 
 
-void NeuralNet::SGD( Data trainingData,const int nEpochs,const int mini_batch_size,const double learningRate,const Data validationData){
+void NeuralNet::SGD( Data trainingData,const int nEpochs,const int mini_batch_size,const double learningRate,const double lambda,const Data validationData){
 
         // Train the neural network using mini-batch stochastic gradient descent.
 
@@ -94,7 +94,7 @@ void NeuralNet::SGD( Data trainingData,const int nEpochs,const int mini_batch_si
 
                 for(size_t i = 0; i < dataSetSize; i+= mini_batch_size) {
                         if(i % 500 == 0) std::cout << "        " << i << " of " <<  dataSetSize << std::endl;
-                        update_mini_batch(mini_batches_img,mini_batches_digits, i,learningRate,mini_batch_size); // update weigts and biases
+                        update_mini_batch(mini_batches_img , mini_batches_digits , i, learningRate , lambda , mini_batch_size, dataSetSize);
                 }
 
                 std::cout << "Epoch " << j << ": " << evaluate(validationData) << " / " << nValSets << std::endl;
@@ -138,7 +138,8 @@ VectorXd NeuralNet::cost_derivative_quad( VectorXd output_activations, VectorXd 
 }
 
 
-void NeuralNet::update_mini_batch(const std::vector<VectorXd> images,const std::vector<int> digits,const int data_idx,const double learningRate,const int mini_batch_size){
+void NeuralNet::update_mini_batch(const std::vector<VectorXd> images,const std::vector<int> digits,const int data_idx,\
+  const double learningRate,const double lambda,const int mini_batch_size, const int dataSetSize){
 
         // Update the network's weights and biases by applying
         // gradient descent using backpropagation to a single mini batch.
@@ -167,8 +168,8 @@ void NeuralNet::update_mini_batch(const std::vector<VectorXd> images,const std::
 
         // update weights and biases
         for (int i = 0; i < m_nLayers-1; i++) {
+                m_weights[i]   =  (1.0-learningRate*(lambda/(double)dataSetSize))*m_weights[i] - (learningRate/mini_batch_size)*nabla_w[i];
                 m_biases[i]   -=  (learningRate/(double)mini_batch_size) * nabla_b[i];
-                m_weights[i]  -=  (learningRate/(double)mini_batch_size) * nabla_w[i];
         }
 
 }
@@ -227,8 +228,6 @@ std::pair<  std::vector<MatrixXd>, std::vector<VectorXd>  > NeuralNet::backprop(
                 activations.push_back(activation);
         }
 
-
-
         nabla_w.resize(m_nLayers-1);
         nabla_b.resize(m_nLayers-1);
 
@@ -238,10 +237,8 @@ std::pair<  std::vector<MatrixXd>, std::vector<VectorXd>  > NeuralNet::backprop(
         MatrixXd ttmp = activations[m_nLayers-2] * delta.transpose();
         nabla_w[m_nLayers-2] = ttmp.transpose();
 
-
         MatrixXd tmp_mat;
         VectorXd sp,tmp_vec;
-
 
         int index;
         for (int i = m_nLayers-2; i > 0; i--){ // go backwards through neural network layers. i == 1
@@ -268,6 +265,6 @@ std::pair<  std::vector<MatrixXd>, std::vector<VectorXd>  > NeuralNet::backprop(
 
 
 
-NeuralNet::~NeuralNet(){   // empty destructor
+NeuralNet::~NeuralNet(){   // destructor
 
 }

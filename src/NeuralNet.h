@@ -14,18 +14,26 @@ using namespace Eigen;
 class NeuralNet {
 
 public:
-        NeuralNet (int,int,int); // constructor
+        NeuralNet (int, int, int); // constructor
         ~NeuralNet();           // Destructor
 
-        void SGD( Data trainingData,const int nEpochs,const int mini_batch_size,const double learningRate,const Data validationData);
+        void SGD( Data trainingData,const int nEpochs,const int mini_batch_size,const double learningRate,const double lambda,const Data validationData);
+
         VectorXd feedforward(const VectorXd input);
+
         VectorXd cost_derivative_quad(const VectorXd output_activations,const VectorXd digitVec,const VectorXd z); // quadratic cost function
+
         VectorXd cost_derivative_cross_entropy(const VectorXd output_activations,const VectorXd y,const VectorXd z); // cross-entropy cost function
-        void update_mini_batch(const std::vector<VectorXd> images,const std::vector<int> digits,const int idx,const double learningRate,const int mini_batch_size);
+
+        void update_mini_batch(const std::vector<VectorXd> images,const std::vector<int> digits,const int idx,const double learningRate,\
+          const double lambda,const int mini_batch_size, const int dataSetSize);
+
         int evaluate( Data);
+
         std::pair<std::vector<MatrixXd>,std::vector<VectorXd>> backprop(const VectorXd img,const int digit);
 
         friend void writeWeightsBiasesToCSV(const std::string filename, NeuralNet& nnet);
+
         friend void readWeightsBiasesFromCSV(const std::string filename, NeuralNet& nnet);
 
 

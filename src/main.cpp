@@ -13,13 +13,13 @@ int main () {
         std::cout << "NeuralNet started\n";
 
         // instantiate NeuralNet object
-        NeuralNet nnet(784, 30, 10);  // nInput, nHidden, nOutput
+        NeuralNet nnet(784, 50, 10);  // nInput, nHidden, nOutput
 
         // instantiate Data object
         std::string testDataDir = "/home/jzuern/Dropbox/develop/C++/Nnet/data/mnist_train.csv";
         std::string validationDataDir = "/home/jzuern/Dropbox/develop/C++/Nnet/data/mnist_test.csv";
 
-        Data trainingData, validationData;                      // instantiate Data object
+        Data trainingData, validationData;                      // instantiate Data objects
 
         std::cout << "Allocating Training Data set...\n";
         trainingData.load_data_from_file(testDataDir);          // load data file into memory
@@ -30,11 +30,12 @@ int main () {
         std::cout << "Allocation successfully completed\n";
 
         const double learningRate = 0.1; // learning rate
-        const int nEpochs =         30; // number of epochs
+        const int nEpochs         = 30; // number of epochs
         const int mini_batch_size = 10; // size of mini batch
+        const double lambda       = 5.0; // L2 regularization parameter
 
         // train NeuralNet with Stochastic Gradient Descent Method
-        nnet.SGD(trainingData, nEpochs, mini_batch_size, learningRate, validationData);
+        nnet.SGD(trainingData, nEpochs, mini_batch_size, learningRate, lambda, validationData);
 
 
         // write weights to file
